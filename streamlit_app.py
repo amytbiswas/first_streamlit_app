@@ -44,7 +44,6 @@ except URLError as e:
 # write your own comment - what does this do?
 
 
-
 streamlit.header("The Fruit Load List Contains:")
 def get_fruit_load_list():
     with my_cnx.cursor() as my_cur:
@@ -55,9 +54,17 @@ if streamlit.button('Get fruit load list'):
    my_cnx = snowflake.connector.connect(**streamlit.secrets["snowflake"])
    my_data_rows = get_fruit_load_list()
    streamlit.dataframe(my_data_rows)
+   
 streamlit.stop()
-#streamlit.header("Fruityvice Fruit Advice!")
-fruit_choice = streamlit.text_input('What fruit would you like to add?','jackfruit')
-streamlit.write('Thanks for adding ', fruit_choice)
 
-my_cur.execute("insert into FRUIT_LOAD_LIST values ('from Streamlit')")
+def insert_row_snowflake(new_fruit):
+   with my_cnx.cursor() as my_cur:
+      my_cur.execute("insert into FRUIT_LOAD_LIST values ('from Streamlit')")
+      return "Thanks for adding " + new_fruit
+add_my_fruit = streamlit.text_input('What fruit would you like to add?')
+if streamlit.button('Add a fruit to the list'):
+   my_cnx = snowflake.connector.connect(**streamlit.secrets["snowflake"])
+   back_from_function = insert_row_snowflake(add_my_fruit)
+   streamlit.text(back_from_function)
+
+
